@@ -9,8 +9,8 @@ import numpy
 from load_data import load_data
 from dbn import DBN
 
-def test_DBN(finetune_lr=0.1, pretraining_epochs=1000,
-             pretrain_lr=0.01, k=1, training_epochs=1000,
+def test_DBN(finetune_lr=0.1, pretraining_epochs=10,
+             pretrain_lr=0.01, k=1, training_epochs=100,
              batch_size=10):
     """
     Demonstrates how to train and test a Deep Belief Network.
@@ -45,7 +45,7 @@ def test_DBN(finetune_lr=0.1, pretraining_epochs=1000,
     print '... building the model'
     # construct the Deep Belief Network
     dbn = DBN(numpy_rng=numpy_rng, n_ins=32 * 32 * 3,
-              hidden_layers_sizes=[2500, 2500, 2500],
+              hidden_layers_sizes=[1000, 1000, 1000],
               n_outs=10)
 
     # start-snippet-2
@@ -151,9 +151,9 @@ def test_DBN(finetune_lr=0.1, pretraining_epochs=1000,
                           (epoch, minibatch_index + 1, n_train_batches,
                            test_score * 100.))
 
-            if patience <= iter:
-                done_looping = True
-                break
+            #if patience <= iter:
+            #    done_looping = True
+            #    break
 
     end_time = time.clock()
     print(
