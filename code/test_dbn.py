@@ -9,8 +9,8 @@ import numpy
 from load_data import load_data
 from dbn import DBN
 
-def test_DBN(finetune_lr=0.1, pretraining_epochs=10,
-             pretrain_lr=0.01, k=1, training_epochs=100,
+def test_DBN(finetune_lr=0.1, pretraining_epochs=1,
+             pretrain_lr=0.01, k=1, training_epochs=1,
              batch_size=10):
     """
     Demonstrates how to train and test a Deep Belief Network.
@@ -91,10 +91,6 @@ def test_DBN(finetune_lr=0.1, pretraining_epochs=10,
     print '... finetuning the model'
     # early-stopping parameters
     patience = 4 * n_train_batches  # look as this many examples regardless
-    patience_increase = 2.    # wait this much longer when a new best is
-                              # found
-    improvement_threshold = 0.995  # a relative improvement of this much is
-                                   # considered significant
     validation_frequency = min(n_train_batches, patience / 2)
                                   # go through this many
                                   # minibatches before checking the network
@@ -103,12 +99,10 @@ def test_DBN(finetune_lr=0.1, pretraining_epochs=10,
 
     best_validation_loss = numpy.inf
     test_score = 0.
+    epoch = 0
     start_time = time.clock()
 
-    done_looping = False
-    epoch = 0
-
-    while (epoch < training_epochs) and (not done_looping):
+    while (epoch < training_epochs):
         epoch = epoch + 1
         for minibatch_index in xrange(n_train_batches):
 
@@ -132,13 +126,6 @@ def test_DBN(finetune_lr=0.1, pretraining_epochs=10,
                 # if we got the best validation score until now
                 if this_validation_loss < best_validation_loss:
 
-                    #improve patience if loss improvement is good enough
-                    if (
-                        this_validation_loss < best_validation_loss *
-                        improvement_threshold
-                    ):
-                        patience = max(patience, iter * patience_increase)
-
                     # save best validation score and iteration number
                     best_validation_loss = this_validation_loss
                     best_iter = iter
@@ -151,9 +138,6 @@ def test_DBN(finetune_lr=0.1, pretraining_epochs=10,
                           (epoch, minibatch_index + 1, n_train_batches,
                            test_score * 100.))
 
-            #if patience <= iter:
-            #    done_looping = True
-            #    break
 
     end_time = time.clock()
     print(
