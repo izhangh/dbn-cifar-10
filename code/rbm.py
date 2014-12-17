@@ -117,7 +117,10 @@ class RBM(object):
         ''' Function to compute the free energy '''
         wx_b = T.dot(v_sample, self.W) + self.hbias
         vbias_term = T.dot(v_sample, self.vbias)
-        hidden_term = T.sum(T.log(1 + T.exp(wx_b)), axis=1)
+        #hidden_term = T.sum(T.log(1 + T.exp(wx_b)), axis=1)
+        import pdb
+        pdb.set_trace()
+        hidden_term = T.sum(T.max(0, wx_b), axis=1)
         return -hidden_term - vbias_term
 
     def propup(self, vis):

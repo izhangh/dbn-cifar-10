@@ -25,32 +25,34 @@ def shared_dataset(data_xy, borrow=True):
   return shared_x, T.cast(shared_y, 'int32')
 
 def load_data():
-  file = os.path.join(os.path.split(__file__)[0], '../data/cifar-10-batches-py', 'data_batch_1')
+  dirpath = os.path.join(os.path.split(__file__)[0], '../data/cifar-10-batches-py')
+
+  file = os.path.join(dirpath, 'data_batch_1')
   train_sets_1 = unpickle(file)
 
-  file = os.path.join(os.path.split(__file__)[0], '../data/cifar-10-batches-py', 'data_batch_2')
+  file = os.path.join(dirpath, 'data_batch_2')
   train_sets_2 = unpickle(file)
 
-  file = os.path.join(os.path.split(__file__)[0], '../data/cifar-10-batches-py', 'data_batch_3')
-  train_sets_3 = unpickle(file)
+  #file = os.path.join(dirpath, 'data_batch_3')
+  #train_sets_3 = unpickle(file)
 
-  file = os.path.join(os.path.split(__file__)[0], '../data/cifar-10-batches-py', 'data_batch_4')
-  train_sets_4 = unpickle(file)
+  #file = os.path.join(dirpath, 'data_batch_4')
+  #train_sets_4 = unpickle(file)
 
-  file = os.path.join(os.path.split(__file__)[0], '../data/cifar-10-batches-py', 'data_batch_5')
+  file = os.path.join(dirpath, 'data_batch_5')
   valid_sets = unpickle(file)
 
-  file = os.path.join(os.path.split(__file__)[0], '../data/cifar-10-batches-py', 'test_batch')
-  test_sets = unpickle(file)
-
-  train_sets_data = numpy.concatenate((train_sets_1['data'], train_sets_2['data'], train_sets_3['data'], train_sets_4['data']), axis=0)
-  train_sets_labels = numpy.concatenate((train_sets_1['labels'], train_sets_2['labels'], train_sets_3['labels'], train_sets_4['labels']), axis=0)
+  #file = os.path.join(dirpath, 'test_batch')
+  #test_sets = unpickle(file)
+ 
+  train_sets_data = numpy.concatenate((train_sets_1['data'], train_sets_2['data']), axis=0)
+  train_sets_labels = numpy.concatenate((train_sets_1['labels'], train_sets_2['labels']), axis=0)
 
   train_set_x, train_set_y = shared_dataset((train_sets_data / 256.0, train_sets_labels))
   valid_set_x, valid_set_y = shared_dataset((valid_sets['data'] / 256.0, valid_sets['labels']))
-  test_set_x, test_set_y = shared_dataset((test_sets['data'] / 256.0, test_sets['labels']))
+  #test_set_x, test_set_y = shared_dataset((test_sets['data'] / 256.0, test_sets['labels']))
 
-  return [(train_set_x, train_set_y), (valid_set_x, valid_set_y), (test_set_x, test_set_y)]
+  return [(train_set_x, train_set_y), (valid_set_x, valid_set_y), (valid_set_x, valid_set_y)]
 
 
 if __name__ == '__main__':

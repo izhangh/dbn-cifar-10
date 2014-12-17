@@ -9,8 +9,8 @@ import numpy
 from load_data import load_data
 from dbn import DBN
 
-def test_DBN(finetune_lr=0.1, pretraining_epochs=1,
-             pretrain_lr=0.01, k=1, training_epochs=1,
+def test_DBN(finetune_lr=0.1, decay=False, training_epochs=100,
+             pretraining_epochs=10, pretrain_lr=0.01, k=1,
              batch_size=10):
     """
     Demonstrates how to train and test a Deep Belief Network.
@@ -19,6 +19,8 @@ def test_DBN(finetune_lr=0.1, pretraining_epochs=1,
 
     :type finetune_lr: float
     :param finetune_lr: learning rate used in the finetune stage
+    :type decay: boolean
+    :param decay: whether use weight decay or not in the finetune stage
     :type pretraining_epochs: int
     :param pretraining_epochs: number of epoch to do pretraining
     :type pretrain_lr: float
@@ -84,8 +86,7 @@ def test_DBN(finetune_lr=0.1, pretraining_epochs=1,
     print '... getting the finetuning functions'
     train_fn, validate_model, test_model = dbn.build_finetune_functions(
         datasets=datasets,
-        batch_size=batch_size,
-        learning_rate=finetune_lr
+        batch_size=batch_size
     )
 
     print '... finetuning the model'
@@ -105,21 +106,24 @@ def test_DBN(finetune_lr=0.1, pretraining_epochs=1,
     while (epoch < training_epochs):
         epoch = epoch + 1
         for minibatch_index in xrange(n_train_batches):
-
-            minibatch_avg_cost = train_fn(minibatch_index)
+            tlearning_rate = finetune_lr
+            if decay:
+                tlearning_rate = finetune_lr/(1.0 + epoch / 10.0)
+               
+            minibatch_avg_cost = train_fn(minibatch_index, tlearning_rate)
             iter = (epoch - 1) * n_train_batches + minibatch_index
 
             if (iter + 1) % validation_frequency == 0:
-
                 validation_losses = validate_model()
                 this_validation_loss = numpy.mean(validation_losses)
                 print(
-                    'epoch %i, minibatch %i/%i, validation error %f %%'
+                    'epoch %i, minibatch %i/%i, validation error %f %%, learning rate %f'
                     % (
                         epoch,
                         minibatch_index + 1,
                         n_train_batches,
-                        this_validation_loss * 100.
+                        this_validation_loss * 100.,
+                        tlearning_rate
                     )
                 )
 

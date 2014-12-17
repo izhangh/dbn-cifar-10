@@ -181,7 +181,7 @@ class DBN(object):
 
         return pretrain_fns
 
-    def build_finetune_functions(self, datasets, batch_size, learning_rate):
+    def build_finetune_functions(self, datasets, batch_size):
         '''Generates a function `train` that implements one step of
         finetuning, a function `validate` that computes the error on a
         batch from the validation set, and a function `test` that
@@ -195,9 +195,6 @@ class DBN(object):
                         datapoints, the other for the labels
         :type batch_size: int
         :param batch_size: size of a minibatch
-        :type learning_rate: float
-        :param learning_rate: learning rate used during finetune stage
-
         '''
 
         (train_set_x, train_set_y) = datasets[0]
@@ -211,6 +208,7 @@ class DBN(object):
         n_test_batches /= batch_size
 
         index = T.lscalar('index')  # index to a [mini]batch
+        learning_rate = T.scalar('lr') # learning rate to used
 
         # compute the gradients with respect to the model parameters
         gparams = T.grad(self.finetune_cost, self.params)
@@ -218,10 +216,11 @@ class DBN(object):
         # compute list of fine-tuning updates
         updates = []
         for param, gparam in zip(self.params, gparams):
-            updates.append((param, param - gparam * learning_rate))
+            updates.append((param, param - gparam * T.cast(learning_rate,
+                                                           dtype=theano.config.floatX)))
 
         train_fn = theano.function(
-            inputs=[index],
+            inputs=[index, theano.Param(learning_rate, default=0.1)],
             outputs=self.finetune_cost,
             updates=updates,
             givens={
